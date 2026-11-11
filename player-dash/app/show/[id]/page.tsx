@@ -15,7 +15,7 @@ async function ShowContent({ params }: { params: Promise<{ id: string }> }) {
   if (!show) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#fffaf1]">
-        <h1 className="text-2xl font-black text-[#25305f]">Desenho não encontrado! 😢</h1>
+        <h1 className="text-2xl font-black text-[#25305f]">Desenho não encontrado!</h1>
       </div>
     )
   }

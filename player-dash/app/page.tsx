@@ -27,7 +27,7 @@ function Header() {
   )
 }
 
-// O botão original[cite: 6] foi substituído pelo componente Link direcionando para a rota dinâmica
+// O botão original foi substituído pelo componente Link direcionando para a rota dinâmica
 function ShowCard({ show }: { show: any }) {
   return (
     <Link href={`/show/${show.id}`} className="group min-w-[172px] text-left sm:min-w-[206px]" aria-label={`Ver detalhes de ${show.title}`}>
@@ -57,7 +57,7 @@ function HomeScreen() {
           <h1 className="text-4xl font-black leading-[.95] tracking-[-2px] text-[#25305f] md:text-6xl">Luna e o<br /><span className="text-[#ff6f91]">Reino Mágico</span></h1>
           <p className="mt-5 max-w-md text-sm font-bold leading-relaxed text-[#33467e]">Uma aventura brilhante começa quando a imaginação ganha vida.</p>
           
-          {/* Botão de assistir do Hero Banner agora é um Link[cite: 6] */}
+          {/* Botão de assistir do Hero Banner agora é um Link */}
           <Link href={`/show/${shows[0].id}`} className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#ff6f91] px-6 py-3 text-sm font-black text-white shadow-[0_5px_0_#d44d76] transition hover:translate-y-0.5">
             <Play size={17} fill="currentColor" /> Assistir agora
           </Link>

@@ -5,9 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Maximize, Play } from 'lucide-react';
 import { shows } from '../../../lib/data';
 
-// URL base do servidor de vídeo. Defina NEXT_PUBLIC_VIDEO_URL na Vercel
-// para não precisar editar o código toda vez que o túnel gerar uma URL nova.
-// (Nota: Removi a barra final "/" para evitar duplicação nas concatenações)
+// URL base do servidor de vídeo. Defina NEXT_PUBLIC_VIDEO_URL na Vercel para não precisar editar o código toda vez que o túnel gerar uma URL nova.
 const VIDEO_BASE_URL =
   process.env.NEXT_PUBLIC_VIDEO_URL ??
   'https://graduates-carlo-essential-tracking.trycloudflare.com';
