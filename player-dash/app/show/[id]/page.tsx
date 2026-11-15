@@ -75,7 +75,7 @@ async function ShowContent({ params }: { params: Promise<{ id: string }> }) {
               
               <div className="flex min-w-0 flex-1 flex-col justify-center">
                 <h3 className="truncate font-black text-[#25305f]">{episode.title}</h3>
-                <p className="mt-1 text-xs font-bold text-[#8490ac]">{episode.duration} · Uma nova aventura</p>
+                <p className="mt-1 text-xs font-bold text-[#8490ac]">{episode.duration} · {episode.sinopse}</p>
               </div>
               
               {/* Botão de Assistir envia para o experimento DASH */}

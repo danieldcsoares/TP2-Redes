@@ -8,7 +8,7 @@ import { shows } from '../../../lib/data';
 // URL base do servidor de vídeo. Defina NEXT_PUBLIC_VIDEO_URL na Vercel para não precisar editar o código toda vez que o túnel gerar uma URL nova.
 const VIDEO_BASE_URL =
   process.env.NEXT_PUBLIC_VIDEO_URL ??
-  'https://graduates-carlo-essential-tracking.trycloudflare.com';
+  'https://preservation-send-profiles-lopez.trycloudflare.com';
 
 function PlayerContent({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -160,16 +160,27 @@ function PlayerContent({ params }: { params: Promise<{ id: string }> }) {
         {capitulos.length > 0 && (
           <section className="mt-8 rounded-[24px] bg-white/5 p-6 border border-white/10">
             <h3 className="mb-4 text-lg font-black text-[#ffd447]">✨ Momentos Mágicos</h3>
-            <div className="flex gap-3 overflow-x-auto pb-2 [scrollbar-width:none]">
-              {capitulos.map((cap, index) => (
-                <button
-                  key={index}
-                  onClick={() => pularParaCapitulo(cap.time)}
-                  className="whitespace-nowrap rounded-full bg-[#111936] px-5 py-2.5 text-sm font-extrabold text-white/80 border border-white/10 shadow-sm transition hover:-translate-y-1 hover:bg-[#62dfe0] hover:text-[#111936] hover:shadow-[0_4px_0_#459c9d]"
-                >
-                  {cap.title}
-                </button>
-              ))}
+            
+            {/* Trocamos o overflow-x-auto por flex-wrap para mostrar todos de uma vez */}
+            <div className="flex flex-wrap gap-3 pb-2">
+              {capitulos.map((cap, index) => {
+                // Pequena lógica para formatar segundos em MM:SS (ex: 65s vira 01:05)
+                const minutos = Math.floor(cap.time / 60).toString().padStart(2, '0');
+                const segundos = (cap.time % 60).toString().padStart(2, '0');
+
+                return (
+                  <button
+                    key={index}
+                    onClick={() => pularParaCapitulo(cap.time)}
+                    className="group flex items-center gap-2 rounded-full bg-[#111936] px-4 py-2.5 text-sm font-extrabold text-white/80 border border-white/10 shadow-sm transition hover:-translate-y-1 hover:bg-[#62dfe0] hover:text-[#111936] hover:shadow-[0_4px_0_#459c9d]"
+                  >
+                    <span className="rounded bg-white/10 px-1.5 py-0.5 text-xs font-black text-[#62dfe0] transition group-hover:bg-[#111936]/20 group-hover:text-[#111936]">
+                      {minutos}:{segundos}
+                    </span>
+                    {cap.title}
+                  </button>
+                );
+              })}
             </div>
           </section>
         )}
