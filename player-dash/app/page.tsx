@@ -1,8 +1,9 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ChevronRight, Play, Search, Sparkles, UserRound } from 'lucide-react'
-import { shows } from '../lib/data' // Importando os dados do arquivo que separamos
+import { shows, getRandomShow, type Show } from '../lib/data' // Importando os dados do arquivo que separamos
 
 // Removemos a propriedade "onHome", agora usamos o Link do Next.js
 function Header() {
@@ -46,19 +47,25 @@ function ShowCard({ show }: { show: any }) {
 }
 
 function HomeScreen() {
+  const [featuredShow, setFeaturedShow] = useState<Show>(shows[0])
+
+  useEffect(() => {
+    setFeaturedShow(getRandomShow())
+  }, [])
+
   return (
     <main id="inicio" className="pb-16">
       <section className="relative mx-5 min-h-[420px] overflow-hidden rounded-[38px] bg-[#72dfe0] shadow-[0_10px_0_#b6e7e3] md:mx-12">
-        <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1800&q=90" alt="Céu mágico" className="absolute inset-0 h-full w-full object-cover opacity-35 mix-blend-multiply" />
+        <img src={featuredShow.image} alt={`Banner de ${featuredShow.title}`} className="absolute inset-0 h-full w-full object-cover opacity-35 mix-blend-multiply" />
         <div className="absolute -right-10 -top-16 h-60 w-60 rounded-full bg-[#ffda3e]/80 blur-sm" />
         <div className="absolute bottom-[-90px] right-32 h-52 w-52 rounded-full bg-[#ff8fb1]/70" />
         <div className="relative max-w-xl px-7 py-14 md:px-14 md:py-24">
           <span className="mb-5 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-black text-[#7c5cff] shadow-sm"><Sparkles size={14} /> HISTÓRIA DA SEMANA</span>
-          <h1 className="text-4xl font-black leading-[.95] tracking-[-2px] text-[#25305f] md:text-6xl">Luna e o<br /><span className="text-[#ff6f91]">Reino Mágico</span></h1>
-          <p className="mt-5 max-w-md text-sm font-bold leading-relaxed text-[#33467e]">Uma aventura brilhante começa quando a imaginação ganha vida.</p>
+          <h1 className="text-4xl font-black leading-[.95] tracking-[-2px] text-[#25305f] md:text-6xl">{featuredShow.title}</h1>
+          <p className="mt-5 line-clamp-3 max-w-md text-sm font-bold leading-relaxed text-[#33467e]">{featuredShow.description}</p>
           
           {/* Botão de assistir do Hero Banner agora é um Link */}
-          <Link href={`/show/${shows[0].id}`} className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#ff6f91] px-6 py-3 text-sm font-black text-white shadow-[0_5px_0_#d44d76] transition hover:translate-y-0.5">
+          <Link href={`/show/${featuredShow.id}`} className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#ff6f91] px-6 py-3 text-sm font-black text-white shadow-[0_5px_0_#d44d76] transition hover:translate-y-0.5">
             <Play size={17} fill="currentColor" /> Assistir agora
           </Link>
         </div>
