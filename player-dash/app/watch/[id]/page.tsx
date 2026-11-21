@@ -24,6 +24,9 @@ function PlayerContent({ params }: { params: Promise<{ id: string }> }) {
   // Estado para armazenar os capítulos gerados pela IA
   const [capitulos, setCapitulos] = useState<{time: number, title: string}[]>([]);
 
+  // Algoritmo de ABR selecionado: 'abrThroughput' (Vazão) ou 'abrBola' (Buffer)
+  const [abrStrategy, setAbrStrategy] = useState<'abrThroughput' | 'abrBola'>('abrThroughput');
+
   // Armazena as métricas coletadas sem causar re-renderizações a cada segundo
   const metricasRef = useRef<
     { tempo_s: number; buffer_s: number; bitrate_kbps: number; resolucao: string; travamentos: number }[]
@@ -46,7 +49,7 @@ function PlayerContent({ params }: { params: Promise<{ id: string }> }) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `metricas_${show?.id}_ep${epIndex + 1}.csv`;
+    link.download = `metricas_${show?.id}_ep${epIndex + 1}_${abrStrategy}.csv`;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -74,6 +77,18 @@ function PlayerContent({ params }: { params: Promise<{ id: string }> }) {
       if (cancelled || !videoRef.current) return;
 
       player = dashjs.MediaPlayer().create();
+
+      // Define a estratégia de ABR escolhida (Vazão ou BOLA) no dash.js v5
+      player.updateSettings({
+        streaming: {
+          abr: {
+            rules: {
+              throughputRule: { active: abrStrategy === 'abrThroughput' },
+              bolaRule: { active: abrStrategy === 'abrBola' },
+            },
+          },
+        },
+      });
 
       // Inicializa o player DASH
       player.initialize(
@@ -139,7 +154,7 @@ function PlayerContent({ params }: { params: Promise<{ id: string }> }) {
 
           metricasRef.current.push(registro);
           console.log(
-            `[MÉTRICA] t=${registro.tempo_s}s | Buffer: ${registro.buffer_s}s | ${registro.resolucao} (${registro.bitrate_kbps} kbps) | Travamentos: ${registro.travamentos}`
+            `[MÉTRICA] t=${registro.tempo_s}s | Buffer: ${registro.buffer_s}s | ${registro.resolucao} (${registro.bitrate_kbps} kbps) | Travamentos: ${registro.travamentos} | Algoritmo: ${abrStrategy}`
           );
         }
       }, 1000);
@@ -152,7 +167,7 @@ function PlayerContent({ params }: { params: Promise<{ id: string }> }) {
       if (interval) clearInterval(interval);
       if (player) player.destroy();
     };
-  }, [showId, epIndex, show]);
+  }, [showId, epIndex, show, abrStrategy]);
 
   // Novo useEffect para carregar os capítulos do JSON gerado pelo Gemini
   useEffect(() => {
@@ -225,7 +240,31 @@ function PlayerContent({ params }: { params: Promise<{ id: string }> }) {
               Episódio {epIndex + 1} — {episode.title}
             </h2>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Seletor de Algoritmo ABR */}
+            <div className="flex rounded-full border border-white/15 bg-white/5 p-1 text-xs font-black">
+              <button
+                onClick={() => setAbrStrategy('abrThroughput')}
+                className={`rounded-full px-3 py-1.5 transition ${
+                  abrStrategy === 'abrThroughput'
+                    ? 'bg-[#ffd447] text-[#111936]'
+                    : 'text-white/60 hover:text-white'
+                }`}
+              >
+                ABR: Vazão
+              </button>
+              <button
+                onClick={() => setAbrStrategy('abrBola')}
+                className={`rounded-full px-3 py-1.5 transition ${
+                  abrStrategy === 'abrBola'
+                    ? 'bg-[#ffd447] text-[#111936]'
+                    : 'text-white/60 hover:text-white'
+                }`}
+              >
+                ABR: BOLA
+              </button>
+            </div>
+
             <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-white/55">
               Duração: {episode.duration}
             </span>
