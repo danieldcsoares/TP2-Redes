@@ -12,8 +12,11 @@ export const shows: Show[] = [
     
   ] },
   { id: 'mecanimais', title: 'Mecanimais', category: 'Aventura', image: '/mecafundo.jpg', accent: '#ed5aa8', description: 'Esta animação, especificamente concebida para pré-escolares, conta as aventuras de uma equipe de animais robôs com superpoderes que partem em aventuras para ajudarem uns aos outros e, ao mesmo tempo, vão aprendendo coisas novas.', episodes: [
-    { title: 'A plantação de turbo feijão', duration: '11 min', image: 'https://i.ytimg.com/vi/_X8UE_DaafE/hqdefault.jpg?sqp=-oaymwEnCNACELwBSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLBPE-gmT0iCi8iXBdJKhn-LOYZwtw' },
-    { title: 'Ilha dos coelhos', duration: '11 min', image: 'https://i.ytimg.com/vi/Njx857MkUNw/hqdefault.jpg?sqp=-oaymwEnCNACELwBSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLCmxN5Qds9SC1HXBaK69VxPO1kRqg' },
+    { title: 'A plantação de turbo feijão', duration: '11 min', image: '/mecanimais/ep1/capaep.png' },
+    { title: 'Ilha dos coelhos', duration: '11 min', image: '/mecanimais/ep2/capaep.jpg' },
+    { title: 'Uma vaca encrencada', duration: '11 min', image: '/mecanimais/ep3/capaep.jpg' },
+    { title: 'A ilha do avião-balei', duration: '11 min', image: '/mecanimais/ep4/capaep.jpg' },
+    { title: 'Ilha da dino montanha', duration: '11 min', image: '/mecanimais/ep5/capaep.jpg' },
   ] },
   { id: 'pocoyo', title: 'Pocoyo', category: 'Aventura', image: '/pocoyofundo.webp', accent: '#ed5aa8', description: 'Quem disse que aprender não é divertido? De chapéu e roupas azuis, Pocoyo faz de cada dia uma inesquecível aventura enquanto explora o mundo ao seu redor ao lado de seus amigos, o que inclui um pato amarelo, uma elefanta rosa, um pássaro dorminhoco e a cadelinha Loula.', episodes: [
     { title: 'Códisago amizade', duration: '11 min', image: 'https://images.unsplash.com/photo-1535378917042-10a22c95931a?auto=format&fit=crop&w=700&q=85' },

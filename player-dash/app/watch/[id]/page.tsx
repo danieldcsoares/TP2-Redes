@@ -24,6 +24,33 @@ function PlayerContent({ params }: { params: Promise<{ id: string }> }) {
   // Estado para armazenar os capítulos gerados pela IA
   const [capitulos, setCapitulos] = useState<{time: number, title: string}[]>([]);
 
+  // Armazena as métricas coletadas sem causar re-renderizações a cada segundo
+  const metricasRef = useRef<
+    { tempo_s: number; buffer_s: number; bitrate_kbps: number; resolucao: string; travamentos: number }[]
+  >([]);
+  const qualidadeAtualRef = useRef({ bitrate_kbps: 0, resolucao: 'N/A' });
+  const travamentosRef = useRef(0);
+
+  const exportarCSV = () => {
+    if (metricasRef.current.length === 0) {
+      alert('Nenhuma métrica coletada ainda. Dê play no vídeo primeiro!');
+      return;
+    }
+
+    const cabecalho = 'tempo_s,buffer_s,bitrate_kbps,resolucao,travamentos\n';
+    const linhas = metricasRef.current
+      .map((m) => `${m.tempo_s},${m.buffer_s},${m.bitrate_kbps},${m.resolucao},${m.travamentos}`)
+      .join('\n');
+
+    const blob = new Blob([cabecalho + linhas], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `metricas_${show?.id}_ep${epIndex + 1}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   // Função para saltar para o momento exato do vídeo
   const pularParaCapitulo = (tempoEmSegundos: number) => {
     if (videoRef.current) {
@@ -55,18 +82,65 @@ function PlayerContent({ params }: { params: Promise<{ id: string }> }) {
         false
       );
 
-      player.on(dashjs.MediaPlayer.events.QUALITY_CHANGE_RENDERED, (e: any) => {
-        console.log(`[MÉTRICA] Qualidade adaptada para o nível: ${e.newQuality}`);
-      });
+      // Reseta métricas ao carregar um novo episódio
+      metricasRef.current = [];
+      travamentosRef.current = 0;
+      let segundosDecorridos = 0;
+
+      // Função auxiliar compatível com dash.js v4 e v5
+      const atualizarQualidade = (e?: any) => {
+        if (e?.mediaType && e.mediaType !== 'video') return;
+
+        // dash.js v5
+        const rep = e?.newRepresentation ?? player.getCurrentRepresentationForType?.('video');
+        if (rep) {
+          const kbps = Math.round((rep.bandwidth ?? 0) / 1000);
+          const res = rep.height ? `${rep.height}p` : 'N/A';
+          qualidadeAtualRef.current = { bitrate_kbps: kbps, resolucao: res };
+          console.log(`[MÉTRICA] Qualidade adaptada: ${res} (${kbps} kbps)`);
+          return;
+        }
+
+        // Fallback dash.js v4
+        if (e?.newQuality !== undefined) {
+          const lista = player.getBitrateInfoListFor?.('video') ?? [];
+          const info = lista[e.newQuality];
+          const kbps = info ? Math.round(info.bitrate / 1000) : 0;
+          const res = info?.height ? `${info.height}p` : `Nível ${e.newQuality}`;
+          qualidadeAtualRef.current = { bitrate_kbps: kbps, resolucao: res };
+          console.log(`[MÉTRICA] Qualidade adaptada: ${res} (${kbps} kbps)`);
+        }
+      };
+
+      player.on(dashjs.MediaPlayer.events.QUALITY_CHANGE_RENDERED, atualizarQualidade);
 
       player.on(dashjs.MediaPlayer.events.BUFFER_EMPTY, () => {
-        console.log('[MÉTRICA] Travamento detectado! O buffer esvaziou.');
+        travamentosRef.current += 1;
+        console.log(`[MÉTRICA] Travamento detectado! Total: ${travamentosRef.current}`);
       });
 
       interval = setInterval(() => {
-        if (player && player.isReady()) {
-          const bufferLevel = player.getBufferLength('video');
-          console.log(`[MÉTRICA] Nível do Buffer atual: ${bufferLevel.toFixed(2)} segundos`);
+        if (player && player.isReady() && videoRef.current && !videoRef.current.paused) {
+          segundosDecorridos += 1;
+          const bufferLevel = Number(player.getBufferLength('video').toFixed(2));
+
+          // Garante leitura inicial mesmo antes da primeira troca de qualidade
+          if (qualidadeAtualRef.current.bitrate_kbps === 0) {
+            atualizarQualidade();
+          }
+
+          const registro = {
+            tempo_s: segundosDecorridos,
+            buffer_s: bufferLevel,
+            bitrate_kbps: qualidadeAtualRef.current.bitrate_kbps,
+            resolucao: qualidadeAtualRef.current.resolucao,
+            travamentos: travamentosRef.current,
+          };
+
+          metricasRef.current.push(registro);
+          console.log(
+            `[MÉTRICA] t=${registro.tempo_s}s | Buffer: ${registro.buffer_s}s | ${registro.resolucao} (${registro.bitrate_kbps} kbps) | Travamentos: ${registro.travamentos}`
+          );
         }
       }, 1000);
     };
@@ -151,9 +225,17 @@ function PlayerContent({ params }: { params: Promise<{ id: string }> }) {
               Episódio {epIndex + 1} — {episode.title}
             </h2>
           </div>
-          <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-white/55">
-            Duração: {episode.duration}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-white/55">
+              Duração: {episode.duration}
+            </span>
+            <button
+              onClick={exportarCSV}
+              className="rounded-full bg-[#62dfe0] px-4 py-2 text-xs font-black text-[#111936] transition hover:bg-[#ffd447]"
+            >
+              Exportar Métricas (CSV)
+            </button>
+          </div>
         </div>
 
         {/* Trilho de Capítulos Gerados por IA */}
