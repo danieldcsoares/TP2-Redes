@@ -110,6 +110,11 @@ function PlayerContent({ params }: { params: Promise<{ id: string }> }) {
       // Define a estratégia de ABR escolhida (Vazão ou BOLA) no dash.js v5
       player.updateSettings({
         streaming: {
+          buffer: {
+          bufferTimeDefault: 12,
+          bufferTimeAtTopQuality: 12,
+          bufferTimeAtTopQualityLongForm: 12,
+        },
           abr: {
             rules: {
               throughputRule: { active: abrStrategy === 'abrThroughput' },
