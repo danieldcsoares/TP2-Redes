@@ -2,7 +2,7 @@
 
 Trabalho 2 de **Redes de Computadores** (UFES, Departamento de Informática), **Projeto 4: vídeo sob demanda adaptativo e navegável por fala**.
 
-**Autores:** `[Nome 1]` e `[Nome 2]`
+**Autores:** `Daniel Dayrell Cruz Soares` e `Davi Santos de Araujo Boni`
 
 ## Descrição
 
