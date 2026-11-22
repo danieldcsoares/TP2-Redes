@@ -14,7 +14,8 @@ def gerar_capitulos(caminho_video, caminho_saida_json):
     print(f"A extrair áudio e transcrever: {caminho_video} (Isto pode demorar um pouco...)")
     
     # 1. Carrega o Whisper (o aviso de FP16 aqui é normal em CPU)
-    modelo_whisper = whisper.load_model("base", device="cpu")
+    dispositivo = "cuda" if torch.cuda.is_available() else "cpu"
+    modelo_whisper = whisper.load_model("base", device=dispositivo)
     resultado = modelo_whisper.transcribe(caminho_video, language="pt")
     
     # 2. Formata a transcrição com os marcadores de tempo

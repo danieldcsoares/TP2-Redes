@@ -2,13 +2,19 @@
 
 import { useEffect, useRef, use, Suspense, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Maximize, Play } from 'lucide-react';
+import { ArrowLeft, Maximize, Play, Search } from 'lucide-react';
 import { shows } from '../../../lib/data';
 
 // URL base do servidor de vídeo. Defina NEXT_PUBLIC_VIDEO_URL na Vercel para não precisar editar o código toda vez que o túnel gerar uma URL nova.
-const VIDEO_BASE_URL =
-  process.env.NEXT_PUBLIC_VIDEO_URL ??
-  'https://preservation-send-profiles-lopez.trycloudflare.com';
+const getVideoBaseUrl = () => {
+  if (process.env.NEXT_PUBLIC_VIDEO_URL) {
+    return process.env.NEXT_PUBLIC_VIDEO_URL;
+  }
+  if (typeof window !== 'undefined') {
+    return `http://${window.location.hostname}:8080`;
+  }
+  return 'http://localhost:8080';
+};
 
 function PlayerContent({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -23,6 +29,29 @@ function PlayerContent({ params }: { params: Promise<{ id: string }> }) {
 
   // Estado para armazenar os capítulos gerados pela IA
   const [capitulos, setCapitulos] = useState<{time: number, title: string}[]>([]);
+
+  const [termoBusca, setTermoBusca] = useState('');
+  const [resultadosBusca, setResultadosBusca] = useState<{ time: number; text: string; score: number }[]>([]);
+  const [buscando, setBuscando] = useState(false);
+
+  const realizarBusca = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!termoBusca.trim() || !show) return;
+
+    setBuscando(true);
+    try {
+      const url = `${getVideoBaseUrl()}/buscar?show=${show.id}&ep=${epIndex + 1}&q=${encodeURIComponent(termoBusca)}`;
+      const resp = await fetch(url);
+      if (resp.ok) {
+        const dados = await resp.json();
+        setResultadosBusca(dados);
+      }
+    } catch (erro) {
+      console.error('Erro na busca por fala:', erro);
+    } finally {
+      setBuscando(false);
+    }
+  };
 
   // Algoritmo de ABR selecionado: 'abrThroughput' (Vazão) ou 'abrBola' (Buffer)
   const [abrStrategy, setAbrStrategy] = useState<'abrThroughput' | 'abrBola'>('abrThroughput');
@@ -93,7 +122,7 @@ function PlayerContent({ params }: { params: Promise<{ id: string }> }) {
       // Inicializa o player DASH
       player.initialize(
         videoRef.current,
-        `${VIDEO_BASE_URL}/${show.id}/ep${epIndex + 1}/manifest.mpd`,
+        `${getVideoBaseUrl()}/${show.id}/ep${epIndex + 1}/manifest.mpd`,
         false
       );
 
@@ -173,7 +202,7 @@ function PlayerContent({ params }: { params: Promise<{ id: string }> }) {
   useEffect(() => {
     const carregarCapitulos = async () => {
       try {
-        const resposta = await fetch(`${VIDEO_BASE_URL}/${show?.id}/ep${epIndex + 1}/chapters.json`);
+        const resposta = await fetch(`${getVideoBaseUrl()}/${show?.id}/ep${epIndex + 1}/chapters.json`);
         if (resposta.ok) {
           const dados = await resposta.json();
           setCapitulos(dados);
@@ -276,6 +305,51 @@ function PlayerContent({ params }: { params: Promise<{ id: string }> }) {
             </button>
           </div>
         </div>
+
+        {/* Busca por Fala (Linguagem Natural) */}
+        <section className="mt-8 rounded-[24px] bg-white/5 p-6 border border-white/10">
+          <h3 className="mb-4 text-lg font-black text-[#62dfe0]">🔎 Buscar cena pela fala</h3>
+          <form onSubmit={realizarBusca} className="flex flex-col gap-3 sm:flex-row">
+            <div className="relative flex-1">
+              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
+              <input
+                type="text"
+                value={termoBusca}
+                onChange={(e) => setTermoBusca(e.target.value)}
+                placeholder="Ex: quando eles encontram a pista?"
+                className="w-full rounded-full border border-white/15 bg-[#111936] py-3 pl-11 pr-4 text-sm text-white placeholder-white/40 outline-none focus:border-[#62dfe0]"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={buscando}
+              className="rounded-full bg-[#ffd447] px-6 py-3 text-sm font-black text-[#111936] transition hover:bg-[#62dfe0] disabled:opacity-50"
+            >
+              {buscando ? 'Buscando...' : 'Ir para a cena'}
+            </button>
+          </form>
+
+          {resultadosBusca.length > 0 && (
+            <div className="mt-4 grid gap-2">
+              {resultadosBusca.map((res, idx) => {
+                const min = Math.floor(res.time / 60).toString().padStart(2, '0');
+                const seg = (res.time % 60).toString().padStart(2, '0');
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => pularParaCapitulo(res.time)}
+                    className="flex items-start gap-3 rounded-2xl border border-white/10 bg-[#111936]/80 p-3.5 text-left transition hover:border-[#62dfe0] hover:bg-[#111936]"
+                  >
+                    <span className="shrink-0 rounded-lg bg-[#62dfe0]/20 px-2.5 py-1 text-xs font-black text-[#62dfe0]">
+                      {min}:{seg}
+                    </span>
+                    <span className="text-sm text-white/85 line-clamp-2">"{res.text}"</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </section>
 
         {/* Trilho de Capítulos Gerados por IA */}
         {capitulos.length > 0 && (
