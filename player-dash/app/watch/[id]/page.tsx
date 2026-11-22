@@ -234,7 +234,7 @@ function PlayerContent({ params }: { params: Promise<{ id: string }> }) {
       <div className="pointer-events-none fixed -left-32 top-40 h-72 w-72 rounded-full bg-[#6c5ce7]/20 blur-3xl" />
       <div className="pointer-events-none fixed -right-20 bottom-10 h-80 w-80 rounded-full bg-[#20d4d7]/15 blur-3xl" />
 
-      <header className="relative z-10 mx-auto flex max-w-[1240px] items-center justify-between px-5 py-6 md:px-8">
+      <header className="relative z-10 mx-auto flex w-full items-center justify-between px-5 py-6 md:px-8">
         <Link
           href={`/show/${show.id}`}
           className="group flex items-center gap-3 rounded-full text-left transition hover:text-[#ffd447]"
@@ -259,17 +259,14 @@ function PlayerContent({ params }: { params: Promise<{ id: string }> }) {
         </button>
       </header>
 
-      <section className="relative z-10 mx-auto max-w-[1240px] px-4 md:px-8">
+      <section className="relative z-10 mx-auto w-full px-4 md:px-8">
         {/* Container do Player DASH */}
-        <div className="relative aspect-video overflow-hidden rounded-[32px] border border-white/10 bg-[#050817] shadow-[0_0_80px_rgba(94,91,220,.3),0_18px_55px_rgba(0,0,0,.3)] group">
-          <video ref={videoRef} controls className="w-full h-full object-contain bg-black" />
-        </div>
+        <div className="relative aspect-video max-h-[78vh] w-full overflow-hidden rounded-[32px] border border-white/10 bg-[#050817] shadow-[0_0_80px_rgba(94,91,220,.3),0_18px_55px_rgba(0,0,0,.3)] group">
+        <video ref={videoRef} controls className="h-full w-full object-contain bg-black" />
+      </div>
 
         <div className="mt-8 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-xs font-extrabold uppercase tracking-[.2em] text-[#62dfe0]">
-              Abra o console (F12) para ver as métricas
-            </p>
             <h2 className="mt-2 text-2xl font-black tracking-tight sm:text-3xl">
               Episódio {epIndex + 1} — {episode.title}
             </h2>

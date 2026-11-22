@@ -63,32 +63,45 @@ async function ShowContent({ params }: { params: Promise<{ id: string }> }) {
           </span>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-2">
-          {show.episodes.map((episode, index) => (
-            <article key={episode.title} className="flex gap-4 rounded-[26px] border-2 border-[#e2f1f2] bg-white p-3 shadow-[0_5px_0_#d7eeee]">
-              <div className="relative h-24 w-36 shrink-0 overflow-hidden rounded-2xl">
-                <img src={episode.image} alt={`Thumbnail: ${episode.title}`} className="h-full w-full object-cover" />
-                <span className="absolute left-2 top-2 rounded-full bg-[#ffda3e] px-2 py-1 text-[10px] font-black text-[#25305f]">
-                  EP {index + 1}
-                </span>
-              </div>
-              
-              <div className="flex min-w-0 flex-1 flex-col justify-center">
-                <h3 className="truncate font-black text-[#25305f]">{episode.title}</h3>
-                <p className="mt-1 text-xs font-bold text-[#8490ac]">{episode.duration} · {episode.sinopse}</p>
-              </div>
-              
-              {/* Botão de Assistir envia para o experimento DASH */}
-              <Link 
-                href={`/watch/${show.id}-ep${index + 1}`} 
-                className="self-center rounded-full bg-[#ff6f91] p-3 text-white shadow-[0_3px_0_#d44d76] transition-transform hover:scale-110" 
-                aria-label={`Assistir ${episode.title}`}
-              >
-                <Play size={16} fill="currentColor" />
-              </Link>
-            </article>
-          ))}
-        </div>
+        <div className="flex flex-col gap-6">
+  {show.episodes.map((episode, index) => (
+    <article
+      key={`${show.id}-ep${index + 1}`}
+      className="flex flex-col gap-5 rounded-[30px] border-2 border-[#e2f1f2] bg-white p-4 shadow-[0_6px_0_#d7eeee] sm:flex-row sm:items-center sm:gap-6 sm:p-5"
+    >
+      {/* Thumbnail bem maior (16:9) */}
+      <div className="relative aspect-video w-full shrink-0 overflow-hidden rounded-[22px] sm:w-64 md:w-80">
+        <img
+          src={episode.image}
+          alt={`Thumbnail: ${episode.title}`}
+          className="h-full w-full object-cover transition duration-300 hover:scale-105"
+        />
+        <span className="absolute left-3 top-3 rounded-full bg-[#ffda3e] px-3 py-1 text-xs font-black text-[#25305f] shadow-sm">
+          EP {index + 1}
+        </span>
+      </div>
+
+      {/* Título e sinopse maiores */}
+      <div className="flex min-w-0 flex-1 flex-col justify-center">
+        <h3 className="truncate text-xl font-black text-[#25305f] sm:text-2xl">
+          {episode.title}
+        </h3>
+        <p className="mt-2 line-clamp-3 text-sm font-bold leading-relaxed text-[#8490ac] sm:text-base">
+          {episode.duration} · {episode.sinopse}
+        </p>
+      </div>
+
+      {/* Botão de Play maior */}
+      <Link
+        href={`/watch/${show.id}-ep${index + 1}`}
+        className="self-end rounded-full bg-[#ff6f91] p-4 text-white shadow-[0_4px_0_#d44d76] transition-transform hover:scale-110 sm:self-center sm:p-5"
+        aria-label={`Assistir ${episode.title}`}
+      >
+        <Play size={24} fill="currentColor" />
+      </Link>
+    </article>
+  ))}
+</div>
       </section>
     </main>
   )
