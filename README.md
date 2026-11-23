@@ -43,7 +43,7 @@ ollama pull qwen2.5:3b   # geração de capítulos
 ollama pull bge-m3       # embeddings para a busca por fala
 ```
 
-Dependências Python (`video_dash/requirements.txt`): `openai-whisper`, `requests`, `pandas`, `matplotlib`.
+Dependências Python (`requirements.txt`): `openai-whisper`, `requests`, `pandas`, `matplotlib`.
 Dependências Node (`player-dash/package.json`): `next`, `react`, `react-dom`, `dashjs`, `lucide-react`, `tailwindcss`, `typescript`.
 
 ### Instruções de Execução
