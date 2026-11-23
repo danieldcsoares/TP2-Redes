@@ -1,6 +1,4 @@
-#!/bin/sh
-'''exec' "/home/davi/Área de Trabalho/UFES/6Periodo/RedesDeComputadores/Trabalho/video_dash/venv/bin/python3" "$0" "$@"
-' '''
+#!/home/ds/Workspaces/Redes/TP2-Redes/video_dash/venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys
