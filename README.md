@@ -241,7 +241,6 @@ Resultados e análise: veja o relatório. Os dados brutos desta entrega estão e
     ├── indexar.py               # transcript.json -> index.json
     ├── experimento.sh           # Traço de banda variável com tc netem
     ├── gerargraficos.py         # Gráficos e tabela de métricas/QoE
-    ├── resultados/              # CSVs, grafico_comparativo.png e resumo_metricas.csv
     └── mecanimais/ep1/          # video.mp4 (incluído), e gerados localmente: manifest.mpd,
                                  # *.m4s, transcript.json, chapters.json, index.json
 ```
